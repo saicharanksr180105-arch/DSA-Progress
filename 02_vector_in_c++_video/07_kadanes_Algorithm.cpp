@@ -18,3 +18,4 @@ cout<<"maxsum by kadane's algorithm is :"<<maxsum<<endl;
 return 0;
 
 }
+ 

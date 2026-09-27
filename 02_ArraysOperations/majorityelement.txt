@@ -1,0 +1,802 @@
+============================================================
+                 MAJORITY ELEMENT
+============================================================
+
+WHAT IS A MAJORITY ELEMENT?
+
+An element is called a Majority Element if it appears MORE
+THAN n/2 times in an array.
+
+Condition:
+
+frequency of element > n/2
+
+Example:
+
+Array = [2, 2, 1, 1, 1, 2, 2]
+
+n = 7
+
+n/2 = 3
+
+Frequency of 2 = 4
+
+4 > 3
+
+Therefore:
+
+Majority Element = 2
+
+
+============================================================
+METHOD 1: BRUTE FORCE APPROACH
+============================================================
+
+IDEA:
+
+For every element, count how many times it appears in the
+array.
+
+If its frequency is greater than n/2, it is the Majority
+Element.
+
+
+STEP-BY-STEP:
+
+Step 1:
+Take the first element.
+
+Step 2:
+Count how many times that element occurs in the array.
+
+Step 3:
+Check:
+
+count > n/2
+
+Step 4:
+If yes, return that element.
+
+Step 5:
+If no, take the next element and repeat the process.
+
+
+EXAMPLE:
+
+Array:
+
+[2, 2, 1, 1, 1, 2, 2]
+
+First element = 2
+
+Count occurrences of 2:
+
+2 → count = 1
+2 → count = 2
+1 → no
+1 → no
+1 → no
+2 → count = 3
+2 → count = 4
+
+So:
+
+count = 4
+n = 7
+
+4 > 7/2
+
+4 > 3
+
+Therefore:
+
+2 is the Majority Element.
+
+
+C++ CODE:
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int majorityElement(vector<int>& nums) {
+
+    int n = nums.size();
+
+    for (int i = 0; i < n; i++) {
+
+        int count = 0;
+
+        for (int j = 0; j < n; j++) {
+
+            if (nums[i] == nums[j]) {
+                count++;
+            }
+        }
+
+        if (count > n / 2) {
+            return nums[i];
+        }
+    }
+
+    return -1;
+}
+
+int main() {
+
+    vector<int> nums = {2, 2, 1, 1, 1, 2, 2};
+
+    cout << majorityElement(nums);
+
+    return 0;
+}
+
+
+HOW THE CODE WORKS:
+
+Outer loop:
+
+for (int i = 0; i < n; i++)
+
+This selects one element at a time.
+
+Inner loop:
+
+for (int j = 0; j < n; j++)
+
+This counts how many times the selected element occurs.
+
+Condition:
+
+if (nums[i] == nums[j])
+
+If both elements are equal:
+
+count++;
+
+
+TIME COMPLEXITY:
+
+Outer loop = O(n)
+Inner loop = O(n)
+
+Therefore:
+
+O(n) × O(n) = O(n²)
+
+
+SPACE COMPLEXITY:
+
+O(1)
+
+Because we are not using any extra data structure.
+
+
+============================================================
+METHOD 2: SORTING APPROACH
+============================================================
+
+IDEA:
+
+First sort the array.
+
+If a Majority Element exists, it MUST occupy the middle
+position of the sorted array.
+
+Therefore:
+
+Majority Element = nums[n/2]
+
+
+EXAMPLE:
+
+Original array:
+
+[2, 2, 1, 1, 1, 2, 2]
+
+After sorting:
+
+[1, 1, 1, 2, 2, 2, 2]
+
+Index:
+
+  0  1  2  3  4  5  6
+  ---------------------
+  1  1  1  2  2  2  2
+           ↑
+          n/2
+
+
+n = 7
+
+n/2 = 3
+
+nums[3] = 2
+
+Therefore:
+
+Majority Element = 2
+
+
+STEP-BY-STEP:
+
+Step 1:
+Sort the array.
+
+Step 2:
+Find the middle index:
+
+n/2
+
+Step 3:
+Return:
+
+nums[n/2]
+
+
+C++ CODE:
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int majorityElement(vector<int>& nums) {
+
+    sort(nums.begin(), nums.end());
+
+    return nums[nums.size() / 2];
+}
+
+int main() {
+
+    vector<int> nums = {2, 2, 1, 1, 1, 2, 2};
+
+    cout << majorityElement(nums);
+
+    return 0;
+}
+
+
+WHY DOES THE MIDDLE ELEMENT WORK?
+
+Suppose:
+
+n = 7
+
+A majority element must appear more than:
+
+7/2 = 3
+
+So it must appear at least:
+
+4 times.
+
+
+Suppose after sorting:
+
+[1, 1, 1, 2, 2, 2, 2]
+
+The majority element occupies positions around the middle.
+
+Middle index:
+
+7/2 = 3
+
+nums[3] = 2
+
+
+Therefore, the middle element must be the majority element.
+
+
+TIME COMPLEXITY:
+
+Sorting takes:
+
+O(n log n)
+
+Accessing the middle element:
+
+O(1)
+
+Therefore overall:
+
+O(n log n)
+
+
+SPACE COMPLEXITY:
+
+Usually:
+
+O(1) auxiliary space
+
+But this depends on the sorting implementation.
+
+IMPORTANT:
+
+This method changes the original array because we sort it.
+
+If we want to preserve the original array, we can make a copy,
+which requires O(n) extra space.
+
+
+============================================================
+METHOD 3: BOYER-MOORE VOTING ALGORITHM
+============================================================
+
+This is the most optimized method among these three.
+
+TIME COMPLEXITY:
+
+O(n)
+
+SPACE COMPLEXITY:
+
+O(1)
+
+
+MAIN IDEA:
+
+The Majority Element appears MORE THAN all other elements
+combined.
+
+Therefore, we can cancel a Majority Element with a different
+element.
+
+The Majority Element will still remain at the end.
+
+
+EXAMPLE:
+
+[2, 2, 1, 1, 1, 2, 2]
+
+There are:
+
+2 → 4 times
+1 → 3 times
+
+2 is the Majority Element.
+
+
+MAIN CONCEPT:
+
+Same element:
+
+count++
+
+Different element:
+
+count--
+
+
+If count becomes 0:
+
+Choose the current element as the new candidate.
+
+
+TWO VARIABLES:
+
+candidate
+
+→ Stores the current possible Majority Element.
+
+
+count
+
+→ Stores the current vote/count balance.
+
+
+STEP-BY-STEP:
+
+Initially:
+
+candidate = 0
+count = 0
+
+
+RULE 1:
+
+If:
+
+count == 0
+
+Then:
+
+candidate = current element
+
+
+RULE 2:
+
+If:
+
+current element == candidate
+
+Then:
+
+count++
+
+
+RULE 3:
+
+If:
+
+current element != candidate
+
+Then:
+
+count--
+
+
+At the end:
+
+candidate = Majority Element
+
+(when the problem guarantees that a majority element exists)
+
+
+============================================================
+BOYER-MOORE DRY RUN
+============================================================
+
+Array:
+
+[2, 2, 1, 1, 1, 2, 2]
+
+
+Initially:
+
+candidate = 0
+count = 0
+
+
+ELEMENT 1:
+
+Current element = 2
+
+count == 0
+
+Therefore:
+
+candidate = 2
+
+Now:
+
+2 == 2
+
+So:
+
+count++
+
+count = 1
+
+
+Current state:
+
+candidate = 2
+count = 1
+
+
+------------------------------------------------------------
+
+ELEMENT 2:
+
+Current element = 2
+
+2 == candidate
+
+Therefore:
+
+count++
+
+count = 2
+
+
+Current state:
+
+candidate = 2
+count = 2
+
+
+------------------------------------------------------------
+
+ELEMENT 3:
+
+Current element = 1
+
+1 != candidate
+
+Therefore:
+
+count--
+
+count = 1
+
+
+Current state:
+
+candidate = 2
+count = 1
+
+
+Here:
+
+2 and 1 cancel each other.
+
+
+------------------------------------------------------------
+
+ELEMENT 4:
+
+Current element = 1
+
+1 != candidate
+
+Therefore:
+
+count--
+
+count = 0
+
+
+Current state:
+
+candidate = 2
+count = 0
+
+
+Again, one 2 and one 1 have been cancelled.
+
+
+------------------------------------------------------------
+
+ELEMENT 5:
+
+Current element = 1
+
+count == 0
+
+Therefore:
+
+candidate = 1
+
+Then:
+
+1 == 1
+
+So:
+
+count++
+
+count = 1
+
+
+Current state:
+
+candidate = 1
+count = 1
+
+
+------------------------------------------------------------
+
+ELEMENT 6:
+
+Current element = 2
+
+2 != candidate
+
+Therefore:
+
+count--
+
+count = 0
+
+
+Current state:
+
+candidate = 1
+count = 0
+
+
+------------------------------------------------------------
+
+ELEMENT 7:
+
+Current element = 2
+
+count == 0
+
+Therefore:
+
+candidate = 2
+
+Then:
+
+2 == 2
+
+So:
+
+count++
+
+count = 1
+
+
+FINAL:
+
+candidate = 2
+
+Therefore:
+
+Majority Element = 2
+
+
+============================================================
+BOYER-MOORE C++ CODE
+============================================================
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int majorityElement(vector<int>& nums) {
+
+    int candidate = 0;
+    int count = 0;
+
+    for (int i = 0; i < nums.size(); i++) {
+
+        if (count == 0) {
+            candidate = nums[i];
+        }
+
+        if (nums[i] == candidate) {
+            count++;
+        }
+        else {
+            count--;
+        }
+    }
+
+    return candidate;
+}
+
+int main() {
+
+    vector<int> nums = {2, 2, 1, 1, 1, 2, 2};
+
+    cout << majorityElement(nums);
+
+    return 0;
+}
+
+
+============================================================
+WHY BOYER-MOORE IS OPTIMIZED
+============================================================
+
+Brute Force:
+
+Two loops
+
+O(n²)
+
+
+Sorting:
+
+Sorting required
+
+O(n log n)
+
+
+Boyer-Moore:
+
+Only one loop
+
+O(n)
+
+
+Boyer-Moore also uses only two variables:
+
+candidate
+count
+
+Therefore:
+
+Space = O(1)
+
+
+============================================================
+COMPARISON OF ALL 3 METHODS
+============================================================
+
+METHOD 1: BRUTE FORCE
+
+Idea:
+Count the frequency of every element.
+
+Time:
+O(n²)
+
+Space:
+O(1)
+
+
+METHOD 2: SORTING
+
+Idea:
+Sort the array and take nums[n/2].
+
+Time:
+O(n log n)
+
+Space:
+O(1) auxiliary space
+(implementation-dependent)
+
+Problem:
+Original array gets modified.
+
+
+METHOD 3: BOYER-MOORE
+
+Idea:
+Cancel different elements using a candidate and count.
+
+Time:
+O(n)
+
+Space:
+O(1)
+
+Advantage:
+Does not require sorting or an extra data structure.
+
+
+============================================================
+FINAL SUMMARY
+============================================================
+
+Majority Element:
+
+frequency > n/2
+
+
+Three important approaches:
+
+1. Brute Force
+   O(n²) time
+   O(1) space
+
+2. Sorting
+   O(n log n) time
+   O(1) auxiliary space
+   Uses nums[n/2]
+
+3. Boyer-Moore Voting Algorithm
+   O(n) time
+   O(1) space
+   Uses candidate and count
+
+
+BEST OPTIMIZED IDEA:
+
+Different elements cancel each other.
+
+Same element:
+count++
+
+Different element:
+count--
+
+count == 0:
+choose a new candidate.
+
+
+IMPORTANT:
+
+The simple Boyer-Moore algorithm assumes that a Majority
+Element exists.
+
+If the problem does NOT guarantee that a Majority Element
+exists, we must perform one additional pass to verify that
+the final candidate occurs more than n/2 times.
+============================================================

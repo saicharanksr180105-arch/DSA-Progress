@@ -1,0 +1,564 @@
+/*
+============================================================
+                    KADANE'S ALGORITHM
+============================================================
+
+Definition:
+-----------
+Kadane's Algorithm is an efficient algorithm used to find
+the maximum sum of a contiguous subarray in an array.
+
+A contiguous subarray means that the elements must be
+continuous without skipping any elements.
+
+Example:
+    arr = {3, -4, 5, 4, -1, 7, -8}
+
+Maximum subarray:
+    {5, 4, -1, 7}
+
+Maximum sum:
+    5 + 4 + (-1) + 7 = 15
+
+
+------------------------------------------------------------
+1. MAIN IDEA OF KADANE'S ALGORITHM
+------------------------------------------------------------
+
+We maintain two variables:
+
+    currentSum
+        -> Stores the sum of the current subarray.
+
+    maxSum
+        -> Stores the maximum sum found so far.
+
+For every element:
+
+    Step 1: Add the current element to currentSum.
+
+    Step 2: Compare currentSum with maxSum and update
+            maxSum if currentSum is larger.
+
+    Step 3: If currentSum becomes negative, reset it to 0.
+
+The basic flow is:
+
+    Add element
+        ↓
+    Update maxSum
+        ↓
+    Is currentSum negative?
+        ↓
+    YES → Reset currentSum to 0
+        ↓
+    Continue to next element
+
+
+------------------------------------------------------------
+2. WHY DO WE RESET currentSum TO 0?
+------------------------------------------------------------
+
+Suppose:
+
+    arr = {-5, 4}
+
+After processing -5:
+
+    currentSum = -5
+
+Now if we carry -5 to the next element:
+
+    currentSum = -5 + 4
+               = -1
+
+But taking only 4 gives:
+
+    4
+
+Therefore, a negative sum is harmful for future elements.
+
+So whenever:
+
+    currentSum < 0
+
+we reset:
+
+    currentSum = 0
+
+This means:
+
+    "Forget the previous subarray and start a new
+     subarray from the next element."
+
+
+------------------------------------------------------------
+3. WHY DO WE UPDATE maxSum BEFORE RESETTING?
+------------------------------------------------------------
+
+This is one of the most important points in Kadane's Algorithm.
+
+Consider:
+
+    arr = {-5, -2, -8}
+
+The correct answer is:
+
+    -2
+
+because -2 is the largest element.
+
+Suppose we reset currentSum before updating maxSum:
+
+    currentSum += arr[i];
+
+    if(currentSum < 0)
+        currentSum = 0;
+
+    maxSum = max(maxSum, currentSum);
+
+For -5:
+
+    currentSum = -5
+    currentSum becomes 0
+    maxSum becomes 0
+
+This gives:
+
+    maxSum = 0
+
+But 0 is WRONG because there is no empty subarray.
+The maximum non-empty subarray is {-2}, whose sum is -2.
+
+Therefore, the correct order is:
+
+    currentSum += arr[i];
+
+    maxSum = max(maxSum, currentSum);
+
+    if(currentSum < 0)
+        currentSum = 0;
+
+
+------------------------------------------------------------
+4. WHY DO WE INITIALIZE maxSum WITH INT_MIN?
+------------------------------------------------------------
+
+We write:
+
+    int maxSum = INT_MIN;
+
+instead of:
+
+    int maxSum = 0;
+
+Why?
+
+Because the array can contain only negative values.
+
+Example:
+
+    arr = {-5, -2, -8, -1}
+
+Correct answer:
+
+    -1
+
+If we initialize:
+
+    maxSum = 0;
+
+then maxSum can remain 0.
+
+But 0 is not present in the array and is not the
+sum of any non-empty subarray.
+
+Therefore:
+
+    int maxSum = INT_MIN;
+
+allows negative values to be correctly stored.
+
+INT_MIN represents the smallest possible value of an int.
+
+We can include:
+
+    #include <climits>
+
+
+------------------------------------------------------------
+5. COMPLETE KADANE'S ALGORITHM
+------------------------------------------------------------
+
+Code:
+
+#include <iostream>
+#include <climits>
+using namespace std;
+
+int main() {
+
+    int arr[] = {3, -4, 5, 4, -1, 7, -8};
+    int n = sizeof(arr) / sizeof(arr[0]);
+
+    int currentSum = 0;
+    int maxSum = INT_MIN;
+
+    for(int i = 0; i < n; i++) {
+
+        currentSum += arr[i];
+
+        maxSum = max(maxSum, currentSum);
+
+        if(currentSum < 0) {
+            currentSum = 0;
+        }
+    }
+
+    cout << "Maximum Subarray Sum = " << maxSum << endl;
+
+    return 0;
+}
+
+
+------------------------------------------------------------
+6. DRY RUN
+------------------------------------------------------------
+
+Array:
+
+    {3, -4, 5, 4, -1, 7, -8}
+
+Initial values:
+
+    currentSum = 0
+    maxSum = INT_MIN
+
+
+i = 0
+Element = 3
+
+    currentSum = 0 + 3 = 3
+    maxSum = max(INT_MIN, 3) = 3
+
+    currentSum is not negative.
+
+Current state:
+
+    currentSum = 3
+    maxSum = 3
+
+
+i = 1
+Element = -4
+
+    currentSum = 3 + (-4) = -1
+    maxSum = max(3, -1) = 3
+
+Since currentSum is negative:
+
+    currentSum = 0
+
+Current state:
+
+    currentSum = 0
+    maxSum = 3
+
+
+i = 2
+Element = 5
+
+    currentSum = 0 + 5 = 5
+    maxSum = max(3, 5) = 5
+
+Current state:
+
+    currentSum = 5
+    maxSum = 5
+
+
+i = 3
+Element = 4
+
+    currentSum = 5 + 4 = 9
+    maxSum = max(5, 9) = 9
+
+Current state:
+
+    currentSum = 9
+    maxSum = 9
+
+
+i = 4
+Element = -1
+
+    currentSum = 9 + (-1) = 8
+    maxSum = max(9, 8) = 9
+
+Current state:
+
+    currentSum = 8
+    maxSum = 9
+
+
+i = 5
+Element = 7
+
+    currentSum = 8 + 7 = 15
+    maxSum = max(9, 15) = 15
+
+Current state:
+
+    currentSum = 15
+    maxSum = 15
+
+
+i = 6
+Element = -8
+
+    currentSum = 15 + (-8) = 7
+    maxSum = max(15, 7) = 15
+
+Current state:
+
+    currentSum = 7
+    maxSum = 15
+
+
+Final Answer:
+
+    maxSum = 15
+
+Maximum subarray:
+
+    {5, 4, -1, 7}
+
+Sum:
+
+    5 + 4 - 1 + 7 = 15
+
+
+------------------------------------------------------------
+7. DRY RUN TABLE
+------------------------------------------------------------
+
+Array:
+
+    {3, -4, 5, 4, -1, 7, -8}
+
++---------+---------+-------------+---------+
+| Element | Current | Max Sum     | Reset? |
++---------+---------+-------------+---------+
+|    3    |    3    |      3      |   No   |
+|   -4    |   -1    |      3      |  Yes   |
+|    5    |    5    |      5      |   No   |
+|    4    |    9    |      9      |   No   |
+|   -1    |    8    |      9      |   No   |
+|    7    |   15    |     15      |   No   |
+|   -8    |    7    |     15      |   No   |
++---------+---------+-------------+---------+
+
+Final answer = 15
+
+
+------------------------------------------------------------
+8. ALL-NEGATIVE ARRAY
+------------------------------------------------------------
+
+Consider:
+
+    arr = {-5, -2, -8, -1}
+
+Initial:
+
+    currentSum = 0
+    maxSum = INT_MIN
+
+
+Process -5:
+
+    currentSum = -5
+    maxSum = -5
+
+    currentSum < 0
+    currentSum = 0
+
+
+Process -2:
+
+    currentSum = -2
+    maxSum = max(-5, -2)
+           = -2
+
+    currentSum = 0
+
+
+Process -8:
+
+    currentSum = -8
+    maxSum = max(-2, -8)
+           = -2
+
+    currentSum = 0
+
+
+Process -1:
+
+    currentSum = -1
+    maxSum = max(-2, -1)
+           = -1
+
+    currentSum = 0
+
+
+Final answer:
+
+    -1
+
+Therefore, Kadane's Algorithm correctly handles
+an all-negative array when maxSum is initialized
+with INT_MIN.
+
+
+------------------------------------------------------------
+9. TIME COMPLEXITY
+------------------------------------------------------------
+
+Kadane's Algorithm uses only one loop.
+
+Therefore:
+
+    Time Complexity = O(n)
+
+where n is the number of elements in the array.
+
+
+------------------------------------------------------------
+10. SPACE COMPLEXITY
+------------------------------------------------------------
+
+We only use two extra variables:
+
+    currentSum
+    maxSum
+
+Therefore:
+
+    Space Complexity = O(1)
+
+
+------------------------------------------------------------
+11. WHY KADANE'S ALGORITHM IS BETTER THAN BRUTE FORCE
+------------------------------------------------------------
+
+Brute Force:
+
+We can generate all possible subarrays and calculate
+their sums.
+
+This requires much more work.
+
+Kadane's Algorithm:
+
+    One pass through the array
+    ↓
+    Keep current sum
+    ↓
+    Keep maximum sum
+    ↓
+    Reset when current sum becomes negative
+
+Therefore:
+
+    Kadane's Algorithm = O(n)
+
+It is much more efficient for large arrays.
+
+
+------------------------------------------------------------
+12. IMPORTANT CONDITIONS TO REMEMBER
+------------------------------------------------------------
+
+1. currentSum starts from 0.
+
+2. maxSum should start from INT_MIN.
+
+3. Add the current element first.
+
+4. Update maxSum before resetting currentSum.
+
+5. If currentSum becomes negative, reset it to 0.
+
+6. The subarray must be CONTIGUOUS.
+
+7. Kadane's Algorithm finds the maximum SUM,
+   not necessarily the maximum number of elements.
+
+
+------------------------------------------------------------
+13. THE MOST IMPORTANT LOGIC
+------------------------------------------------------------
+
+The complete logic can be remembered as:
+
+    currentSum += arr[i];
+
+    maxSum = max(maxSum, currentSum);
+
+    if(currentSum < 0)
+        currentSum = 0;
+
+
+Remember:
+
+    ADD
+     ↓
+    SAVE MAXIMUM
+     ↓
+    RESET IF NEGATIVE
+
+
+------------------------------------------------------------
+14. ONE-LINE INTUITION
+------------------------------------------------------------
+
+"If the current subarray has a negative total,
+it will only reduce the sum of any future subarray,
+so discard it and start fresh."
+
+
+============================================================
+                    FINAL SUMMARY
+============================================================
+
+Kadane's Algorithm finds the maximum sum of a contiguous
+subarray in O(n) time and O(1) extra space.
+
+Main variables:
+
+    currentSum → current subarray sum
+    maxSum     → maximum sum found so far
+
+Main steps:
+
+    1. Add arr[i] to currentSum.
+    2. Update maxSum.
+    3. If currentSum < 0, reset currentSum to 0.
+
+Most important point:
+
+    maxSum must be updated BEFORE resetting currentSum.
+
+For all-negative arrays:
+
+    Initialize maxSum = INT_MIN
+
+because the answer must be one of the negative values,
+not 0.
+
+Memory trick:
+
+    ADD → UPDATE MAX → RESET
+
+============================================================
+*/
